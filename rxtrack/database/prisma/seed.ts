@@ -7,11 +7,21 @@ import {
   UserRole,
 } from "@prisma/client";
 
-const prisma = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
-});
+const connectionString =
+  process.env.DATABASE_URL ||
+  "postgresql://postgres:Sunny@localhost:5432/rxtrack?schema=public";
+
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
+
+// Precomputed bcrypt hash for "password123" (salt rounds: 10)
+const defaultPasswordHash =
+  "$2b$10$JVNfdf7NfzKw6n2q91GZ0Oe99qT5eGPKd93vn6VGg.GLpAGv8ET7m";
 
 async function main() {
+  console.log("Seeding RxTrack database...");
+
+  // Clean in dependent order
   await prisma.fulfillment.deleteMany();
   await prisma.prescriptionMedicine.deleteMany();
   await prisma.prescription.deleteMany();
@@ -23,7 +33,7 @@ async function main() {
     data: {
       name: "Dr. Maya Patel",
       email: "doctor@rxtrack.dev",
-      passwordHash: "dev-hash-doctor",
+      passwordHash: defaultPasswordHash,
       role: UserRole.DOCTOR,
     },
   });
@@ -32,7 +42,7 @@ async function main() {
     data: {
       name: "Pharmacy Admin",
       email: "pharmacy@rxtrack.dev",
-      passwordHash: "dev-hash-pharmacy",
+      passwordHash: defaultPasswordHash,
       role: UserRole.PHARMACY,
     },
   });
@@ -41,7 +51,7 @@ async function main() {
     data: {
       name: "Platform Admin",
       email: "admin@rxtrack.dev",
-      passwordHash: "dev-hash-admin",
+      passwordHash: defaultPasswordHash,
       role: UserRole.ADMIN,
     },
   });
@@ -97,7 +107,7 @@ async function main() {
 
   const prescriptionOne = await prisma.prescription.create({
     data: {
-      patientName: "Sample Patient A",
+      patientName: "Rahul Verma",
       doctorId: doctor.id,
       status: PrescriptionStatus.PENDING,
       medicines: {
@@ -121,7 +131,7 @@ async function main() {
 
   const prescriptionTwo = await prisma.prescription.create({
     data: {
-      patientName: "Sample Patient B",
+      patientName: "Anita Singh",
       doctorId: doctor.id,
       status: PrescriptionStatus.READY,
       medicines: {
@@ -161,13 +171,13 @@ async function main() {
     },
   });
 
+  console.log("Seeding complete:");
   console.log({
-    doctor: doctor.email,
-    pharmacyUser: pharmacyUser.email,
-    admin: admin.email,
-    pharmacy: pharmacy.name,
-    medicines: medicines.length,
-    prescriptions: 2,
+    doctor: `${doctor.email} (password: password123)`,
+    pharmacy: `${pharmacyUser.email} (password: password123)`,
+    admin: `${admin.email} (password: password123)`,
+    medicinesCreated: medicines.length,
+    prescriptionsCreated: 2,
   });
 }
 
