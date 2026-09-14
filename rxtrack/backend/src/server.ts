@@ -14,9 +14,22 @@ import pharmacyRoutes from "./routes/pharmacy.routes";
 
 const app = express();
 
+const allowedOrigins = ENV.CORS_ORIGIN.split(",").map((s) => s.trim());
+
 app.use(
   cors({
-    origin: ENV.CORS_ORIGIN,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (
+        ENV.CORS_ORIGIN === "*" ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app") ||
+        origin.includes("localhost")
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -62,6 +75,10 @@ app.get("/api/me", authenticate, (req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.listen(ENV.PORT, '0.0.0.0', () => {
-  console.log(`RxTrack API listening on http://localhost:${ENV.PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(ENV.PORT, '0.0.0.0', () => {
+    console.log(`RxTrack API listening on http://localhost:${ENV.PORT}`);
+  });
+}
+
+export default app;
