@@ -192,7 +192,7 @@ export default function DoctorDashboard() {
               Upload prescription
             </button>
             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-bold text-[#273353]">
-              MP
+              AM
             </div>
           </div>
         </div>
@@ -203,7 +203,7 @@ export default function DoctorDashboard() {
             {/* Header */}
             <div className="mb-8">
               <p className="text-xs font-semibold text-[#273353] mb-2 tracking-wide">CLINICAL PRACTICE DASHBOARD</p>
-              <h1 className="text-5xl font-bold text-gray-900 mb-4" style={{ fontFamily: SERIF, fontWeight: 600 }}>Good day, Dr. Maya Patel</h1>
+              <h1 className="text-5xl font-bold text-gray-900 mb-4" style={{ fontFamily: SERIF, fontWeight: 600 }}>Good day, Dr. Arjun Mehta</h1>
               <p className="text-base text-gray-600 leading-relaxed max-w-2xl">
                 Real-time visibility into whether your patients fill their prescriptions across partner pharmacies.
               </p>
@@ -466,3 +466,5 @@ export default function DoctorDashboard() {
       </div>
   )
 }
+
+
